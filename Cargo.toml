@@ -2,6 +2,10 @@
 name = "rustcalc"
 version = "1.0.1"
 edition = "2024"
+license = "GPL-3.0-only"
+description = "Une calculatrice élégante développée en Rust avec egui."
+homepage = "https://github.com/Rafpren/RustCalc"
+repository = "https://github.com/Rafpren/RustCalc"
 
 [dependencies]
 eframe = "0.29"
@@ -15,3 +19,16 @@ lto = true
 codegen-units = 1
 panic = 'abort'
 strip = true
+
+[package.metadata.generate-rpm]
+package = "rustcalc"
+assets = [
+    { source = "target/release/rustcalc", dest = "/usr/bin/rustcalc", mode = "755" },
+    { source = "rustcalc.desktop", dest = "/usr/share/applications/rustcalc.desktop", mode = "644" }
+]
+
+[package.metadata.generate-rpm.cargo]
+buildflags = ["--release"]
+
+[package.metadata.generate-rpm.targets]
+rustcalc = { path = "/usr/bin/rustcalc" }

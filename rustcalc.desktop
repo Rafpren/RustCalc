@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=RustCalc
+Comment=Calculatrice élégante en Rust
+Exec=rustcalc
+Icon=calculator
+Terminal=false
+Categories=Utility;
