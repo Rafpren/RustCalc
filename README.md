@@ -14,4 +14,4 @@ Si vous souhaitez compiler le projet vous-même :
 1. Assurez-vous d'avoir [Rust](https://www.rust-lang.org/) installé.
 2. Clonez le dépôt :
    ```bash
-   git clone [https://github.com/Rafpren/ma_calculatrice.git](https://github.com/Rafpren/ma_calculatrice.git)
+   git clone [https://github.com/Rafpren/RustCalc.git](https://github.com/Rafpren/RustCalc.git)
