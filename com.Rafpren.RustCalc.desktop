@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=RustCalc
+Comment=Une calculatrice moderne écrite en Rust
+Exec=rustcalc
+Icon=com.Rafpren.RustCalc
+Terminal=false
+Type=Application
+Categories=Utility;Calculator;

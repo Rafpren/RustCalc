@@ -1,3 +1,12 @@
-/target
+# Rust - Compilation et artefacts
+/target/
 Cargo.lock
+
+# Flatpak - Dossiers de build (très lourds, ne jamais push)
+.flatpak-builder/
+fb-build/
+
+# Backups et fichiers temporaires
 **/*.rs.bk
+*.swp
+*~
