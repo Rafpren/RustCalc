@@ -1,4 +1,4 @@
-# 🧮 Ma Calculatrice Rust (GUI)
+# 🧮 RustCalc (GUI)
 
 Une calculatrice performante et élégante développée en **Rust** avec l'interface graphique **egui**. Ce projet gère les priorités opératoires et les parenthèses.
 
