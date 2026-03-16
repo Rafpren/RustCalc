@@ -12,7 +12,7 @@ fn main() -> eframe::Result {
     };
 
     eframe::run_native(
-        "Calculatrice Pro Rust",
+        "RustCalc",
         options,
         Box::new(|_cc| Ok(Box::<CalculatriceApp>::default())),
     )
@@ -55,7 +55,7 @@ impl eframe::App for CalculatriceApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.add_space(10.0);
             ui.vertical_centered(|ui| {
-                ui.heading(RichText::new("CALCULATRICE RUST").strong().color(Color32::LIGHT_BLUE));
+                ui.heading(RichText::new("RustCalc").strong().color(Color32::LIGHT_BLUE));
             });
             ui.add_space(15.0);
 
