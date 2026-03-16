@@ -13,7 +13,6 @@ eframe = "0.29"
 [build-dependencies]
 winres = "0.1"
 
-# Garde tes options d'optimisation en bas
 [profile.release]
 lto = true
 codegen-units = 1
@@ -39,3 +38,4 @@ assets = [
     ["target/release/rustcalc", "usr/bin/rustcalc", "755"],
     ["rustcalc.desktop", "usr/share/applications/rustcalc.desktop", "644"],
 ]
+depends = "$auto, libc6, libssl3"
