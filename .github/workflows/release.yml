@@ -65,10 +65,11 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          # On récupère récursivement tous les fichiers générés
+          # Le double astérisque cherche dans TOUS les sous-dossiers
           files: |
-            assets-windows-latest/rustcalc.exe
-            assets-ubuntu-latest/**/*.deb
-            assets-ubuntu-latest/**/*.rpm
+            **/*.exe
+            **/*.deb
+            **/*.rpm
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
