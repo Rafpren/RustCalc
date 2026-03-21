@@ -1,7 +1,13 @@
 fn main() {
-    if cfg!(target_os = "windows") {
+    // Ce script ne doit s'exécuter que si l'on compile pour Windows
+    #[cfg(target_os = "windows")]
+    {
         let mut res = winres::WindowsResource::new();
-        res.set_icon("icon.ico"); // Le nom de ton fichier icône
+        // Spécifie le chemin vers ton fichier .ico
+        res.set_icon("icon.ico");
+        // Tu peux aussi ajouter des métadonnées visibles dans les propriétés du fichier
+        res.set("ProductName", "RustCalc");
+        res.set("CompanyName", "Rafpren");
         res.compile().unwrap();
     }
 }

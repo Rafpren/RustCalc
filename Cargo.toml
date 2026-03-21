@@ -1,6 +1,6 @@
 [package]
 name = "rustcalc"
-version = "1.2.3"
+version = "1.2.4"
 edition = "2024"
 license = "GPL-3.0-only"
 description = "Une calculatrice élégante développée en Rust avec egui."
@@ -25,7 +25,9 @@ strip = true
 package = "rustcalc"
 assets = [
     { source = "target/release/rustcalc", dest = "/usr/bin/rustcalc", mode = "755" },
-    { source = "rustcalc.desktop", dest = "/usr/share/applications/rustcalc.desktop", mode = "644" }
+    { source = "rustcalc.desktop", dest = "/usr/share/applications/rustcalc.desktop", mode = "644" },
+    # Copie l'icône dans le dossier système
+    { source = "icons/icon.png", dest = "/usr/share/icons/hicolor/512x512/apps/rustcalc.png", mode = "644" }
 ]
 
 [package.metadata.generate-rpm.cargo]
@@ -39,6 +41,8 @@ maintainer = "Rafpren <raf.prencipe@pm.me>"
 assets = [
     ["target/release/rustcalc", "usr/bin/rustcalc", "755"],
     ["rustcalc.desktop", "usr/share/applications/rustcalc.desktop", "644"],
+    # Copie l'icône (le chemin cible doit être relatif)
+    ["icons/icon.png", "usr/share/icons/hicolor/512x512/apps/rustcalc.png", "644"]
 ]
 depends = "$auto, libc6, libssl3"
 
