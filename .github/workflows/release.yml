@@ -1,0 +1,74 @@
+name: Release RustCalc
+
+on:
+  push:
+    tags:
+      - 'v*' # Se déclenche lors du push d'un tag comme v1.2.3
+
+jobs:
+  build:
+    name: Build for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            artifact_name: rustcalc.exe
+          - os: ubuntu-latest
+            artifact_name: rustcalc
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      # Configuration spécifique à Linux pour compiler egui et générer les paquets
+      - name: Install Linux dependencies and RPM tools
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwayland-dev libxkbcommon-dev libegl1-mesa-dev libgl1-mesa-dev libgles2-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev rpm
+          cargo install cargo-deb cargo-generate-rpm
+
+      - name: Build Windows Release
+        if: matrix.os == 'windows-latest'
+        run: cargo build --release
+
+      - name: Build Linux Packages (.deb & .rpm)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          cargo build --release
+          cargo deb
+          cargo generate-rpm
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: assets-${{ matrix.os }}
+          path: |
+            target/release/rustcalc.exe
+            target/debian/*.deb
+            target/generate-rpm/*.rpm
+
+  create_release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          # On récupère récursivement tous les fichiers générés
+          files: |
+            assets-windows-latest/rustcalc.exe
+            assets-ubuntu-latest/**/*.deb
+            assets-ubuntu-latest/**/*.rpm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

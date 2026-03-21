@@ -1,8 +1,9 @@
 [Desktop Entry]
 Type=Application
+Version=1.0
 Name=RustCalc
-Comment=Calculatrice élégante en Rust
+Comment=Calculatrice moderne en Rust
 Exec=rustcalc
-Icon=calculator
+Icon=rustcalc
 Terminal=false
-Categories=Utility;
+Categories=Utility;Calculator;

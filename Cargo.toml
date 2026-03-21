@@ -1,6 +1,6 @@
 [package]
 name = "rustcalc"
-version = "1.2.2"
+version = "1.2.3"
 edition = "2024"
 license = "GPL-3.0-only"
 description = "Une calculatrice élégante développée en Rust avec egui."
@@ -41,3 +41,6 @@ assets = [
     ["rustcalc.desktop", "usr/share/applications/rustcalc.desktop", "644"],
 ]
 depends = "$auto, libc6, libssl3"
+
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]
