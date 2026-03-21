@@ -1,12 +1,22 @@
-# Rust - Compilation et artefacts
+# --- Rust ---
 /target/
-Cargo.lock
+# Garde Cargo.lock si c'est une application, ignore-le si c'est une lib
+# Cargo.lock 
 
-# Flatpak - Dossiers de build (très lourds, ne jamais push)
+# --- Configuration locale (Interdit le push de tes réglages PC) ---
+.cargo/config.toml
+.cargo/credentials.toml
+
+# --- Flatpak & Build ---
 .flatpak-builder/
 fb-build/
+_build/
 
-# Backups et fichiers temporaires
-**/*.rs.bk
+# --- Artefacts OS & Editeurs ---
+.DS_Store
+Thumbs.db
 *.swp
 *~
+.vscode/
+.idea/
+
