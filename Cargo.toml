@@ -1,11 +1,12 @@
 [package]
 name = "rustcalc"
-version = "1.0.1"
+version = "1.2.2"
 edition = "2024"
 license = "GPL-3.0-only"
 description = "Une calculatrice élégante développée en Rust avec egui."
 homepage = "https://github.com/Rafpren/RustCalc"
 repository = "https://github.com/Rafpren/RustCalc"
+authors = ["Rafpren"]
 
 [dependencies]
 eframe = "0.29"
