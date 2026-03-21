@@ -20,13 +20,13 @@ Vous pouvez télécharger la dernière version dans la section [Releases](https:
 * Téléchargez le fichier `.rpm`.
 * Installez-le avec :
   ```bash
-  sudo dnf install ./rustcalc-1.0.1-1.x86_64.rpm
+  sudo dnf install ./rustcalc-*.x86_64.rpm
 
 ### 🐧 Linux (Debian, Ubuntu, Mint)
 * Téléchargez le fichier .deb.
 * Installez-le avec :
   ```bash
-  sudo apt install ./rustcalc_1.0.1-1_amd64.deb
+  sudo apt install ./rustcalc_*_amd64.deb
 
 Si vous souhaitez compiler le projet vous-même :
 
