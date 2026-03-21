@@ -38,3 +38,9 @@ git clone https://github.com/Rafpren/RustCalc.git
 
 3. Installez les dépendances (Linux uniquement) : `libxcb-devel libxkbcommon-devel openssl-devel`
 4. Compilez : `cargo build --release`
+
+---
+
+## 🎨 Crédits
+
+* **Icône de l'application :** Créée par Rafpren
