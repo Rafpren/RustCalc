@@ -1,6 +1,6 @@
 [package]
 name = "rustcalc"
-version = "1.2.4"
+version = "1.2.5"
 edition = "2024"
 license = "GPL-3.0-only"
 description = "Une calculatrice élégante développée en Rust avec egui."
@@ -10,6 +10,7 @@ authors = ["Rafpren"]
 
 [dependencies]
 eframe = "0.29"
+image = { version = "0.25", default-features = false, features = ["png"] }
 
 [build-dependencies]
 winres = "0.1"
@@ -45,6 +46,3 @@ assets = [
     ["icons/icon.png", "usr/share/icons/hicolor/512x512/apps/rustcalc.png", "644"]
 ]
 depends = "$auto, libc6, libssl3"
-
-[target.x86_64-pc-windows-msvc]
-rustflags = ["-C", "target-feature=+crt-static"]

@@ -1,21 +1,38 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use eframe::egui;
-use eframe::egui::{Color32, RichText, Button, Vec2, Key};
+use eframe::egui::{Color32, RichText, Button, Vec2, Key, IconData};
 use std::collections::VecDeque;
+use std::sync::Arc;
+use image;
 
-fn main() -> eframe::Result {
-    let options = eframe::NativeOptions {
+fn main() -> eframe::Result<()> {
+    // Chargement de l'icône
+    let icon_bytes = include_bytes!("../icons/icon.png");
+    let icon_image = image::load_from_memory(icon_bytes)
+        .expect("Échec du chargement de l'icône")
+        .to_rgba8();
+    let (width, height) = icon_image.dimensions();
+
+    let icon = IconData {
+        rgba: icon_image.into_raw(),
+        width,
+        height,
+    };
+
+    // Configuration de la fenêtre avec largeur optimisée pour la symétrie
+    let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size([360.0, 600.0])
-            .with_resizable(true),
+            .with_inner_size([340.0, 620.0])
+            .with_icon(Arc::new(icon))
+            .with_resizable(false),
         ..Default::default()
     };
 
     eframe::run_native(
         "RustCalc",
-        options,
-        Box::new(|_cc| Ok(Box::<CalculatriceApp>::default())),
+        native_options,
+        Box::new(|_cc| Ok(Box::new(CalculatriceApp::default()))),
     )
 }
 
@@ -62,94 +79,114 @@ impl CalculatriceApp {
 
 impl eframe::App for CalculatriceApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        ctx.set_visuals(egui::Visuals::dark());
+        // --- STYLE ET VISUELS ---
+        let mut visuals = egui::Visuals::dark();
+        visuals.widgets.inactive.bg_fill = Color32::from_rgb(45, 45, 50);
+        visuals.widgets.hovered.bg_fill = Color32::from_rgb(60, 60, 70);
+        visuals.widgets.active.bg_fill = Color32::from_rgb(80, 80, 100);
+        visuals.widgets.inactive.rounding = 10.0.into();
+        ctx.set_visuals(visuals);
 
-        // --- GESTION DU CLAVIER ROBUSTE (v1.2.1) ---
+        // --- GESTION DES TOUCHES CLAVIER ---
         ctx.input(|i| {
-            // 1. Capturer la saisie de texte (Chiffres, Opérateurs, Points)
             for event in &i.events {
                 if let egui::Event::Text(t) = event {
-                    // On ne laisse passer que les caractères valides pour une calculatrice
                     if "0123456789+-*/().".contains(t) {
                         self.input.push_str(t);
                     }
                 }
             }
-
-            // 2. Capturer les touches de contrôle (Indépendantes du pavé numérique ou non)
             if i.key_pressed(Key::Enter) { self.calculer(); }
             if i.key_pressed(Key::Escape) || i.key_pressed(Key::Delete) { self.effacer(); }
             if i.key_pressed(Key::Backspace) { self.input.pop(); }
         });
 
-        // --- UI (Layout stable v1.1.2) ---
-        egui::TopBottomPanel::bottom("footer").show(ctx, |ui| {
-            ui.add_space(5.0);
-            ui.vertical_centered(|ui| {
-                ui.label(RichText::new(format!("Version {}", env!("CARGO_PKG_VERSION"))).size(9.0).weak());
-                ui.add_space(2.0);
-                ui.label(RichText::new("Développé par :").size(10.0).weak());
-                ui.label(RichText::new("PRENCIPE Raffaele").strong().color(Color32::LIGHT_GRAY));
-                ui.hyperlink_to("raf.prencipe@pm.me", "mailto:raf.prencipe@pm.me");
-            });
-            ui.add_space(5.0);
-        });
-
-        egui::CentralPanel::default().show(ctx, |ui| {
-            ui.add_space(10.0);
-            ui.vertical_centered(|ui| ui.heading(RichText::new("RustCalc").strong().color(Color32::LIGHT_BLUE)));
-            ui.add_space(15.0);
-
-            ui.add(egui::TextEdit::singleline(&mut self.input)
-                .font(egui::TextStyle::Monospace)
-                .desired_width(f32::INFINITY)
-                .interactive(false));
-
-            ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
-                let color = if self.a_erreur { Color32::LIGHT_RED } else { Color32::WHITE };
-                ui.label(RichText::new(&self.resultat).size(30.0).color(color));
-            });
-
-            ui.add_space(10.0); ui.separator(); ui.add_space(10.0);
-
-            let spacing = 8.0;
-            let btn_width = (ui.available_width() - (3.0 * spacing)) / 4.0;
-            let btn_size = Vec2::new(btn_width, 60.0);
-
-            ui.vertical(|ui| {
-                let rows = [
-                    vec![("(", None), (")", None), ("C", Some(Color32::LIGHT_RED)), ("/", Some(Color32::GOLD))],
-                    vec![("7", None), ("8", None), ("9", None), ("*", Some(Color32::GOLD))],
-                    vec![("4", None), ("5", None), ("6", None), ("-", Some(Color32::GOLD))],
-                    vec![("1", None), ("2", None), ("3", None), ("+", Some(Color32::GOLD))],
-                ];
-
-                for row in rows {
-                    ui.horizontal(|ui| {
-                        for (label, color) in row {
-                            let btn = Button::new(RichText::new(label).color(color.unwrap_or(Color32::WHITE)));
-                            if ui.add(btn.min_size(btn_size)).clicked() {
-                                if label == "C" { self.effacer(); } else { self.input.push_str(label); }
-                            }
-                            ui.add_space(spacing);
-                        }
-                    });
-                    ui.add_space(spacing);
-                }
-
-                ui.horizontal(|ui| {
-                    if ui.add(Button::new("0").min_size(Vec2::new(btn_width * 2.0 + spacing, 60.0))).clicked() { self.input.push('0'); }
-                    ui.add_space(spacing);
-                    if ui.add(Button::new(".").min_size(btn_size)).clicked() { self.input.push('.'); }
-                    ui.add_space(spacing);
-                    if ui.add(Button::new(RichText::new("=").color(Color32::GREEN)).min_size(btn_size)).clicked() { self.calculer(); }
+        // --- FOOTER ---
+        egui::TopBottomPanel::bottom("footer")
+            .frame(egui::Frame::none().inner_margin(10.0))
+            .show(ctx, |ui| {
+                ui.vertical_centered(|ui| {
+                    ui.label(RichText::new("Développé par : PRENCIPE Raffaele").size(11.0).strong().color(Color32::from_rgb(110, 160, 255)));
                 });
             });
-        });
+
+        // --- INTERFACE PRINCIPALE (CENTRAL PANEL) ---
+        egui::CentralPanel::default()
+            .frame(egui::Frame::none().inner_margin(egui::Margin {
+                left: 15.0,   // Marge gauche fixe
+                right: 15.0,  // Marge droite identique pour la symétrie
+                top: 20.0,
+                bottom: 10.0,
+            }))
+            .show(ctx, |ui| {
+                ui.vertical_centered(|ui| ui.heading(RichText::new("RUSTCALC").strong().extra_letter_spacing(1.5).color(Color32::LIGHT_BLUE)));
+                ui.add_space(20.0);
+
+                // Écran d'affichage
+                ui.group(|ui| {
+                    ui.set_width(ui.available_width());
+                    ui.add(egui::TextEdit::singleline(&mut self.input)
+                        .font(egui::FontId::monospace(18.0))
+                        .desired_width(f32::INFINITY)
+                        .frame(false)
+                        .interactive(false));
+
+                    ui.add_space(5.0);
+
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+                        let color = if self.a_erreur { Color32::LIGHT_RED } else { Color32::WHITE };
+                        ui.label(RichText::new(&self.resultat).size(32.0).strong().color(color));
+                    });
+                });
+
+                ui.add_space(20.0);
+                ui.separator();
+                ui.add_space(20.0);
+
+                // GRILLE DE BOUTONS SYMÉTRIQUE
+                let spacing = 8.0;
+                let total_spacing = 3.0 * spacing;
+                let btn_width = (ui.available_width() - total_spacing) / 4.0;
+                let btn_size = Vec2::new(btn_width, 60.0);
+
+                ui.vertical(|ui| {
+                    let rows = [
+                        vec![("(", None), (")", None), ("C", Some(Color32::from_rgb(220, 100, 100))), ("/", Some(Color32::from_rgb(255, 170, 0)))],
+                        vec![("7", None), ("8", None), ("9", None), ("*", Some(Color32::from_rgb(255, 170, 0)))],
+                        vec![("4", None), ("5", None), ("6", None), ("-", Some(Color32::from_rgb(255, 170, 0)))],
+                        vec![("1", None), ("2", None), ("3", None), ("+", Some(Color32::from_rgb(255, 170, 0)))],
+                    ];
+
+                    for row in rows {
+                        ui.horizontal(|ui| {
+                            ui.spacing_mut().item_spacing.x = spacing; // Force l'espacement horizontal précis
+                            for (label, color) in row {
+                                let text = RichText::new(label).size(20.0).color(color.unwrap_or(Color32::WHITE));
+                                if ui.add(Button::new(text).min_size(btn_size)).clicked() {
+                                    if label == "C" { self.effacer(); } else { self.input.push_str(label); }
+                                }
+                            }
+                        });
+                        ui.add_space(spacing);
+                    }
+
+                    // Dernière ligne (0 large, point, égal)
+                    ui.horizontal(|ui| {
+                        ui.spacing_mut().item_spacing.x = spacing;
+                        let zero_width = (btn_width * 2.0) + spacing;
+                        if ui.add(Button::new(RichText::new("0").size(20.0)).min_size(Vec2::new(zero_width, 60.0))).clicked() { self.input.push('0'); }
+
+                        if ui.add(Button::new(RichText::new(".").size(20.0)).min_size(btn_size)).clicked() { self.input.push('.'); }
+
+                        if ui.add(Button::new(RichText::new("=").size(22.0).strong().color(Color32::GREEN)).min_size(btn_size)).clicked() { self.calculer(); }
+                    });
+                });
+            });
     }
 }
 
-// --- ENGINE (Statique, robuste) ---
+// --- LOGIQUE DE CALCUL (ENGINE) ---
+
 #[derive(Debug, Clone, PartialEq)]
 enum Token { Nombre(f64), Plus, Moins, Multiplier, Diviser, ParenOuvrante, ParenFermante, UnaryMoins }
 
