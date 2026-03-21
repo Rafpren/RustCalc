@@ -6,7 +6,7 @@ use eframe::egui::{Color32, RichText};
 fn main() -> eframe::Result {
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size([320.0, 500.0]) // Augmenté pour la version et les infos
+            .with_inner_size([320.0, 500.0])
             .with_resizable(false),
         ..Default::default()
     };
@@ -108,7 +108,7 @@ impl eframe::App for CalculatriceApp {
     }
 }
 
-// --- MOTEUR DE CALCUL ---
+// --- ENGINE ---
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum Token {
