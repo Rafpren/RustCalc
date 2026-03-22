@@ -8,6 +8,8 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  # Cette ligne règle le problème de dépréciation de Node.js 20
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true 
 
 jobs:
   check-and-test:
@@ -28,14 +30,13 @@ jobs:
 
       - name: Vérification du format (rustfmt)
         run: cargo fmt --check
-        # Si le code est mal indenté, le CI s'arrête ici.
 
       - name: Analyse statique (clippy)
         run: cargo clippy -- -D warnings
-        # Transforme les avertissements en erreurs pour obliger à coder proprement.
 
       - name: Compilation
         run: cargo build --verbose
 
       - name: Exécution des tests
         run: cargo test --verbose
+        
