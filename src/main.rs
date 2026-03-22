@@ -85,7 +85,7 @@ impl eframe::App for CalculatriceApp {
         visuals.widgets.inactive.bg_fill = Color32::from_rgb(45, 45, 50);
         visuals.widgets.hovered.bg_fill = Color32::from_rgb(60, 60, 70);
         visuals.widgets.active.bg_fill = Color32::from_rgb(80, 80, 100);
-        visuals.widgets.inactive.rounding = 10.0.into();
+        visuals.widgets.inactive.corner_radius = egui::CornerRadius::same(10);
         ctx.set_visuals(visuals);
 
         // --- GESTION DES TOUCHES CLAVIER ---
@@ -110,7 +110,7 @@ impl eframe::App for CalculatriceApp {
 
         // --- FOOTER ---
         egui::TopBottomPanel::bottom("footer")
-            .frame(egui::Frame::none().inner_margin(10.0))
+            .frame(egui::Frame::default().inner_margin(10))
             .show(ctx, |ui| {
                 ui.vertical_centered(|ui| {
                     ui.label(
@@ -124,11 +124,11 @@ impl eframe::App for CalculatriceApp {
 
         // --- INTERFACE PRINCIPALE (CENTRAL PANEL) ---
         egui::CentralPanel::default()
-            .frame(egui::Frame::none().inner_margin(egui::Margin {
-                left: 15.0,  // Marge gauche fixe
-                right: 15.0, // Marge droite identique pour la symétrie
-                top: 20.0,
-                bottom: 10.0,
+            .frame(egui::Frame::default().inner_margin(egui::Margin {
+                left: 15,
+                right: 15,
+                top: 20,
+                bottom: 10,
             }))
             .show(ctx, |ui| {
                 ui.vertical_centered(|ui| {

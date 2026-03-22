@@ -9,7 +9,7 @@ repository = "https://github.com/Rafpren/RustCalc"
 authors = ["Rafpren"]
 
 [dependencies]
-eframe = "0.29"
+eframe = "0.33.3"
 image = { version = "0.25", default-features = false, features = ["png"] }
 
 [build-dependencies]
