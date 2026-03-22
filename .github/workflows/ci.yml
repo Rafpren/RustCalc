@@ -1,0 +1,41 @@
+name: Rust CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check-and-test:
+    name: Compilation & Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Installation du toolchain Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Cache des dépendances
+        uses: Swatinem/rust-cache@v2
+
+      - name: Vérification du format (rustfmt)
+        run: cargo fmt --check
+        # Si le code est mal indenté, le CI s'arrête ici.
+
+      - name: Analyse statique (clippy)
+        run: cargo clippy -- -D warnings
+        # Transforme les avertissements en erreurs pour obliger à coder proprement.
+
+      - name: Compilation
+        run: cargo build --verbose
+
+      - name: Exécution des tests
+        run: cargo test --verbose

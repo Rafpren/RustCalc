@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: "cargo" # Cible mes fichiers Cargo.toml et Cargo.lock
+    directory: "/"             # Racine du projet
+    schedule:
+      interval: "weekly"       # "weekly" suffit pour RustCalc
+    open-pull-requests-limit: 5 # Ne m'ouvre pas 50 PR d'un coup
+    reviewers:
+      - "Rafpren"              # Auto-assignation pour ne pas rater la PR
+    groups:
+      dependencies:            # Regroupe les updates mineures pour éviter le bruit
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
