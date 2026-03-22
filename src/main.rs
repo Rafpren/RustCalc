@@ -92,7 +92,8 @@ impl eframe::App for CalculatriceApp {
         ctx.input(|i| {
             for event in &i.events {
                 if let egui::Event::Text(t) = event
-                    && "0123456789+-*/().".contains(t) {
+                    && "0123456789+-*/().".contains(t)
+                {
                     self.input.push_str(t);
                 }
             }
