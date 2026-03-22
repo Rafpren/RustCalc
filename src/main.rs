@@ -2,7 +2,6 @@
 
 use eframe::egui;
 use eframe::egui::{Button, Color32, IconData, Key, RichText, Vec2};
-use image;
 use std::collections::VecDeque;
 use std::sync::Arc;
 
@@ -92,10 +91,9 @@ impl eframe::App for CalculatriceApp {
         // --- GESTION DES TOUCHES CLAVIER ---
         ctx.input(|i| {
             for event in &i.events {
-                if let egui::Event::Text(t) = event {
-                    if "0123456789+-*/().".contains(t) {
-                        self.input.push_str(t);
-                    }
+                if let egui::Event::Text(t) = event
+                    && "0123456789+-*/().".contains(t) {
+                    self.input.push_str(t);
                 }
             }
             if i.key_pressed(Key::Enter) {
@@ -305,10 +303,10 @@ fn lexer(input: &str) -> Result<Vec<Token>, String> {
             chars.next();
             continue;
         }
-        if c.is_digit(10) || c == '.' {
+        if c.is_ascii_digit() || c == '.' {
             let mut s = String::new();
             while let Some(&nc) = chars.peek() {
-                if nc.is_digit(10) || nc == '.' {
+                if nc.is_ascii_digit() || nc == '.' {
                     s.push(nc);
                     chars.next();
                 } else {
