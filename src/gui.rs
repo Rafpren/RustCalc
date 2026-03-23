@@ -1,6 +1,6 @@
+use crate::engine::resoudre_expression;
 use eframe::egui;
 use eframe::egui::{Button, Color32, Key, RichText, Vec2};
-use crate::engine::resoudre_expression;
 
 pub struct CalculatriceApp {
     input: String,
@@ -21,7 +21,9 @@ impl Default for CalculatriceApp {
 impl CalculatriceApp {
     fn calculer(&mut self) {
         let trim_input = self.input.trim();
-        if trim_input.is_empty() { return; }
+        if trim_input.is_empty() {
+            return;
+        }
 
         match resoudre_expression(trim_input) {
             Ok(val) => {
@@ -33,7 +35,9 @@ impl CalculatriceApp {
                         .trim_end_matches('0')
                         .trim_end_matches('.')
                         .to_string();
-                    if self.resultat.is_empty() { self.resultat = "0".into(); }
+                    if self.resultat.is_empty() {
+                        self.resultat = "0".into();
+                    }
                     self.a_erreur = false;
                 }
             }
@@ -69,14 +73,16 @@ impl eframe::App for CalculatriceApp {
                             }
                         }
                     }
-                    egui::Event::Key { key, pressed: true, .. } => {
-                        match *key {
-                            Key::Enter => self.calculer(),
-                            Key::Escape | Key::Delete => self.effacer(),
-                            Key::Backspace => { self.input.pop(); },
-                            _ => {}
+                    egui::Event::Key {
+                        key, pressed: true, ..
+                    } => match *key {
+                        Key::Enter => self.calculer(),
+                        Key::Escape | Key::Delete => self.effacer(),
+                        Key::Backspace => {
+                            self.input.pop();
                         }
-                    }
+                        _ => {}
+                    },
                     _ => {}
                 }
             }
@@ -87,7 +93,12 @@ impl eframe::App for CalculatriceApp {
             .frame(egui::Frame::default().inner_margin(10))
             .show(ctx, |ui| {
                 ui.vertical_centered(|ui| {
-                    ui.label(RichText::new("Développé par : Raffaele PRENCIPE").size(11.0).strong().color(Color32::from_rgb(110, 160, 255)));
+                    ui.label(
+                        RichText::new("Développé par : Raffaele PRENCIPE")
+                            .size(11.0)
+                            .strong()
+                            .color(Color32::from_rgb(110, 160, 255)),
+                    );
                 });
             });
 
@@ -96,17 +107,37 @@ impl eframe::App for CalculatriceApp {
             .frame(egui::Frame::default().inner_margin(15))
             .show(ctx, |ui| {
                 ui.vertical_centered(|ui| {
-                    ui.heading(RichText::new("RUSTCALC").strong().extra_letter_spacing(1.5).color(Color32::LIGHT_BLUE));
+                    ui.heading(
+                        RichText::new("RUSTCALC")
+                            .strong()
+                            .extra_letter_spacing(1.5)
+                            .color(Color32::LIGHT_BLUE),
+                    );
                 });
                 ui.add_space(20.0);
 
                 ui.group(|ui| {
                     ui.set_width(ui.available_width());
-                    ui.add(egui::TextEdit::singleline(&mut self.input).font(egui::FontId::monospace(18.0)).desired_width(f32::INFINITY).frame(false).interactive(false));
+                    ui.add(
+                        egui::TextEdit::singleline(&mut self.input)
+                            .font(egui::FontId::monospace(18.0))
+                            .desired_width(f32::INFINITY)
+                            .frame(false)
+                            .interactive(false),
+                    );
                     ui.add_space(5.0);
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
-                        let color = if self.a_erreur { Color32::LIGHT_RED } else { Color32::WHITE };
-                        ui.label(RichText::new(&self.resultat).size(32.0).strong().color(color));
+                        let color = if self.a_erreur {
+                            Color32::LIGHT_RED
+                        } else {
+                            Color32::WHITE
+                        };
+                        ui.label(
+                            RichText::new(&self.resultat)
+                                .size(32.0)
+                                .strong()
+                                .color(color),
+                        );
                     });
                 });
 
@@ -119,18 +150,52 @@ impl eframe::App for CalculatriceApp {
                 let btn_size = Vec2::new(btn_width, 60.0);
 
                 let rows = [
-                    vec![("(", None), (")", None), ("C", Some(Color32::from_rgb(220, 100, 100))), ("/", Some(Color32::from_rgb(255, 170, 0)))],
-                    vec![("7", None), ("8", None), ("9", None), ("*", Some(Color32::from_rgb(255, 170, 0)))],
-                    vec![("4", None), ("5", None), ("6", None), ("-", Some(Color32::from_rgb(255, 170, 0)))],
-                    vec![("1", None), ("2", None), ("3", None), ("+", Some(Color32::from_rgb(255, 170, 0)))],
+                    vec![
+                        ("(", None),
+                        (")", None),
+                        ("C", Some(Color32::from_rgb(220, 100, 100))),
+                        ("/", Some(Color32::from_rgb(255, 170, 0))),
+                    ],
+                    vec![
+                        ("7", None),
+                        ("8", None),
+                        ("9", None),
+                        ("*", Some(Color32::from_rgb(255, 170, 0))),
+                    ],
+                    vec![
+                        ("4", None),
+                        ("5", None),
+                        ("6", None),
+                        ("-", Some(Color32::from_rgb(255, 170, 0))),
+                    ],
+                    vec![
+                        ("1", None),
+                        ("2", None),
+                        ("3", None),
+                        ("+", Some(Color32::from_rgb(255, 170, 0))),
+                    ],
                 ];
 
                 for row in rows {
                     ui.horizontal(|ui| {
                         ui.spacing_mut().item_spacing.x = spacing;
                         for (label, color) in row {
-                            if ui.add(Button::new(RichText::new(label).size(20.0).color(color.unwrap_or(Color32::WHITE))).min_size(btn_size)).clicked() {
-                                if label == "C" { self.effacer(); } else { self.input.push_str(label); }
+                            if ui
+                                .add(
+                                    Button::new(
+                                        RichText::new(label)
+                                            .size(20.0)
+                                            .color(color.unwrap_or(Color32::WHITE)),
+                                    )
+                                    .min_size(btn_size),
+                                )
+                                .clicked()
+                            {
+                                if label == "C" {
+                                    self.effacer();
+                                } else {
+                                    self.input.push_str(label);
+                                }
                             }
                         }
                     });
@@ -139,9 +204,32 @@ impl eframe::App for CalculatriceApp {
 
                 ui.horizontal(|ui| {
                     ui.spacing_mut().item_spacing.x = spacing;
-                    if ui.add(Button::new(RichText::new("0").size(20.0)).min_size(Vec2::new((btn_width * 2.0) + spacing, 60.0))).clicked() { self.input.push('0'); }
-                    if ui.add(Button::new(RichText::new(".").size(20.0)).min_size(btn_size)).clicked() { self.input.push('.'); }
-                    if ui.add(Button::new(RichText::new("=").size(22.0).strong().color(Color32::GREEN)).min_size(btn_size)).clicked() { self.calculer(); }
+                    if ui
+                        .add(
+                            Button::new(RichText::new("0").size(20.0))
+                                .min_size(Vec2::new((btn_width * 2.0) + spacing, 60.0)),
+                        )
+                        .clicked()
+                    {
+                        self.input.push('0');
+                    }
+                    if ui
+                        .add(Button::new(RichText::new(".").size(20.0)).min_size(btn_size))
+                        .clicked()
+                    {
+                        self.input.push('.');
+                    }
+                    if ui
+                        .add(
+                            Button::new(
+                                RichText::new("=").size(22.0).strong().color(Color32::GREEN),
+                            )
+                            .min_size(btn_size),
+                        )
+                        .clicked()
+                    {
+                        self.calculer();
+                    }
                 });
             });
     }

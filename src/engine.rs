@@ -1,7 +1,16 @@
 use std::collections::VecDeque;
 
 #[derive(Debug, Clone, PartialEq)]
-enum Token { Nombre(f64), Plus, Moins, Multiplier, Diviser, ParenOuvrante, ParenFermante, UnaryMoins }
+enum Token {
+    Nombre(f64),
+    Plus,
+    Moins,
+    Multiplier,
+    Diviser,
+    ParenOuvrante,
+    ParenFermante,
+    UnaryMoins,
+}
 
 impl Token {
     fn precedence(&self) -> i32 {
@@ -13,7 +22,10 @@ impl Token {
         }
     }
     fn est_operateur(&self) -> bool {
-        matches!(self, Token::Plus | Token::Moins | Token::Multiplier | Token::Diviser | Token::UnaryMoins)
+        matches!(
+            self,
+            Token::Plus | Token::Moins | Token::Multiplier | Token::Diviser | Token::UnaryMoins
+        )
     }
 }
 
@@ -24,14 +36,18 @@ fn lexer(input: &str) -> Result<Vec<Token>, String> {
 
     while let Some(&c) = chars.peek() {
         match c {
-            ' ' | '\t' => { chars.next(); }
+            ' ' | '\t' => {
+                chars.next();
+            }
             '0'..='9' | '.' => {
                 let mut s = String::new();
                 while let Some(&nc) = chars.peek() {
                     if nc.is_ascii_digit() || nc == '.' {
                         s.push(nc);
                         chars.next();
-                    } else { break; }
+                    } else {
+                        break;
+                    }
                 }
                 tokens.push(Token::Nombre(s.parse().map_err(|_| "Nombre invalide")?));
                 peut_etre_unaire = false;
@@ -39,15 +55,34 @@ fn lexer(input: &str) -> Result<Vec<Token>, String> {
             '+' | '-' | '*' | '/' | '(' | ')' => {
                 chars.next();
                 match c {
-                    '+' => { tokens.push(Token::Plus); peut_etre_unaire = true; }
-                    '-' => {
-                        tokens.push(if peut_etre_unaire { Token::UnaryMoins } else { Token::Moins });
+                    '+' => {
+                        tokens.push(Token::Plus);
                         peut_etre_unaire = true;
                     }
-                    '*' => { tokens.push(Token::Multiplier); peut_etre_unaire = true; }
-                    '/' => { tokens.push(Token::Diviser); peut_etre_unaire = true; }
-                    '(' => { tokens.push(Token::ParenOuvrante); peut_etre_unaire = true; }
-                    ')' => { tokens.push(Token::ParenFermante); peut_etre_unaire = false; }
+                    '-' => {
+                        tokens.push(if peut_etre_unaire {
+                            Token::UnaryMoins
+                        } else {
+                            Token::Moins
+                        });
+                        peut_etre_unaire = true;
+                    }
+                    '*' => {
+                        tokens.push(Token::Multiplier);
+                        peut_etre_unaire = true;
+                    }
+                    '/' => {
+                        tokens.push(Token::Diviser);
+                        peut_etre_unaire = true;
+                    }
+                    '(' => {
+                        tokens.push(Token::ParenOuvrante);
+                        peut_etre_unaire = true;
+                    }
+                    ')' => {
+                        tokens.push(Token::ParenFermante);
+                        peut_etre_unaire = false;
+                    }
                     _ => unreachable!(),
                 }
             }
@@ -68,23 +103,32 @@ fn shunting_yard(tokens: Vec<Token>) -> Result<VecDeque<Token>, String> {
             Token::ParenFermante => {
                 let mut trouve = false;
                 while let Some(top) = pile.pop() {
-                    if top == Token::ParenOuvrante { trouve = true; break; }
+                    if top == Token::ParenOuvrante {
+                        trouve = true;
+                        break;
+                    }
                     sortie.push_back(top);
                 }
-                if !trouve { return Err("Parenthèse orpheline".into()); }
+                if !trouve {
+                    return Err("Parenthèse orpheline".into());
+                }
             }
             _ => {
                 while let Some(top) = pile.last() {
                     if top.est_operateur() && top.precedence() >= token.precedence() {
                         sortie.push_back(pile.pop().unwrap());
-                    } else { break; }
+                    } else {
+                        break;
+                    }
                 }
                 pile.push(token);
             }
         }
     }
     while let Some(t) = pile.pop() {
-        if t == Token::ParenOuvrante { return Err("Parenthèse non fermée".into()); }
+        if t == Token::ParenOuvrante {
+            return Err("Parenthèse non fermée".into());
+        }
         sortie.push_back(t);
     }
     Ok(sortie)
@@ -107,7 +151,9 @@ fn evaluer_rpn(rpn: VecDeque<Token>) -> Result<f64, String> {
                     Token::Moins => pile.push(a - b),
                     Token::Multiplier => pile.push(a * b),
                     Token::Diviser => {
-                        if b.abs() < f64::EPSILON { return Err("Div/0".into()); }
+                        if b.abs() < f64::EPSILON {
+                            return Err("Div/0".into());
+                        }
                         pile.push(a / b);
                     }
                     _ => {}

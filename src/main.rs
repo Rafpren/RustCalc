@@ -4,10 +4,10 @@
 mod engine;
 mod gui;
 
+use crate::gui::CalculatriceApp;
 use eframe::egui;
 use eframe::egui::IconData;
 use std::sync::Arc;
-use crate::gui::CalculatriceApp;
 
 fn main() -> eframe::Result<()> {
     // Chargement sécurisé de l'icône
