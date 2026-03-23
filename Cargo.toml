@@ -38,7 +38,7 @@ buildflags = ["--release"]
 rustcalc = { path = "/usr/bin/rustcalc" }
 
 [package.metadata.deb]
-maintainer = "Rafpren <268448116+Rafpren@users.noreply.github.com>"
+maintainer = "Rafpren <Rafpren@users.noreply.github.com>"
 assets = [
     ["target/release/rustcalc", "usr/bin/rustcalc", "755"],
     ["rustcalc.desktop", "usr/share/applications/rustcalc.desktop", "644"],
