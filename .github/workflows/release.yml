@@ -3,7 +3,7 @@ name: Release RustCalc
 on:
   push:
     tags:
-      - 'v*' # Se déclenche lors du push d'un tag comme v1.2.3
+      - 'v*' 
 
 jobs:
   build:
@@ -24,7 +24,6 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      # Configuration spécifique à Linux pour compiler egui et générer les paquets
       - name: Install Linux dependencies and RPM tools
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -65,7 +64,6 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          # Le double astérisque cherche dans TOUS les sous-dossiers
           files: |
             **/*.exe
             **/*.deb

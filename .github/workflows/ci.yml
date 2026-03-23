@@ -8,7 +8,6 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  # Cette ligne règle le problème de dépréciation de Node.js 20
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true 
 
 jobs:
