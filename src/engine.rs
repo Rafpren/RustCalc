@@ -167,3 +167,49 @@ fn evaluer_rpn(rpn: VecDeque<Token>) -> Result<f64, String> {
 pub fn resoudre_expression(input: &str) -> Result<f64, String> {
     evaluer_rpn(shunting_yard(lexer(input)?)?)
 }
+
+// --- TESTS UNITAIRES ---
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_calculs_basiques() {
+        assert_eq!(resoudre_expression("2+2").unwrap(), 4.0);
+        assert_eq!(resoudre_expression("10-3").unwrap(), 7.0);
+        assert_eq!(resoudre_expression("4*5").unwrap(), 20.0);
+        assert_eq!(resoudre_expression("20/4").unwrap(), 5.0);
+    }
+
+    #[test]
+    fn test_priorite_operateurs() {
+        // La multiplication doit primer sur l'addition
+        assert_eq!(resoudre_expression("2+3*4").unwrap(), 14.0);
+        assert_eq!(resoudre_expression("10-6/2").unwrap(), 7.0);
+    }
+
+    #[test]
+    fn test_parentheses() {
+        assert_eq!(resoudre_expression("(2+3)*4").unwrap(), 20.0);
+        assert_eq!(resoudre_expression("10/(2+3)").unwrap(), 2.0);
+        assert_eq!(resoudre_expression("((2+2)*3)-1").unwrap(), 11.0);
+    }
+
+    #[test]
+    fn test_nombres_decimaux_et_unaires() {
+        assert_eq!(resoudre_expression("2.5*2").unwrap(), 5.0);
+        assert_eq!(resoudre_expression("-5+3").unwrap(), -2.0);
+        assert_eq!(resoudre_expression("10*-2").unwrap(), -20.0);
+    }
+
+    #[test]
+    fn test_gestion_des_erreurs() {
+        // Ces expressions DOIVENT renvoyer une erreur (Err)
+        assert!(resoudre_expression("5/0").is_err()); // Division par zéro
+        assert!(resoudre_expression("(2+2").is_err()); // Parenthèse non fermée
+        assert!(resoudre_expression("2+2)").is_err()); // Parenthèse orpheline
+        assert!(resoudre_expression("a+b").is_err()); // Lettres interdites
+        assert!(resoudre_expression("5++5").is_err()); // Opérande manquant
+    }
+}
