@@ -8,16 +8,24 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true 
 
 jobs:
   check-and-test:
-    name: Compilation & Tests
-    runs-on: ubuntu-latest
+    name: Compilation & Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
 
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
+
+      - name: Installation des dépendances Linux (egui/eframe)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwayland-dev libxkbcommon-dev libegl1-mesa-dev libgl1-mesa-dev libgles2-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev
 
       - name: Installation du toolchain Rust
         uses: dtolnay/rust-toolchain@stable
@@ -27,15 +35,17 @@ jobs:
       - name: Cache des dépendances
         uses: Swatinem/rust-cache@v2
 
+      # Le formatage et l'analyse statique ne tournent que sur Ubuntu pour gagner du temps
       - name: Vérification du format (rustfmt)
+        if: matrix.os == 'ubuntu-latest'
         run: cargo fmt --check
 
       - name: Analyse statique (clippy)
+        if: matrix.os == 'ubuntu-latest'
         run: cargo clippy -- -D warnings
 
-      - name: Compilation
+      - name: Compilation (Debug)
         run: cargo build --verbose
 
-      - name: Exécution des tests
+      - name: Exécution des tests unitaires
         run: cargo test --verbose
-        
