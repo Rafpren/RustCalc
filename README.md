@@ -1,12 +1,13 @@
 # 🧮 RustCalc (GUI)
 
-Une calculatrice performante et élégante développée en **Rust** avec l'interface graphique **egui**. Ce projet gère les priorités opératoires et les parenthèses.
+RustCalc est une calculatrice moderne développée en **Rust** avec l'interface graphique **egui**. Ce projet gère les priorités opératoires et les parenthèses.
 
 ## ✨ Fonctionnalités
 - **Calcul complet** : Supporte les additions, soustractions, multiplications et divisions.
 - **Priorités mathématiques** : Gère correctement l'ordre des opérations et les parenthèses.
 - **Interface Graphique (GUI)** : Une fenêtre interactive avec thème sombre et boutons colorés.
 - **Portable** : Un seul fichier par OS `.exe`, `.rpm` et `.deb` sans installation nécessaire pour Windows mais bien pour Debian et Fedora
+
 
 ## 🛠️ Installation & Compilation
 
