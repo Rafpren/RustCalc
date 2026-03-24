@@ -14,31 +14,37 @@ jobs:
         include:
           - os: windows-latest
             artifact_name: rustcalc.exe
+            asset_name: assets-windows
           - os: ubuntu-latest
             artifact_name: rustcalc
+            asset_name: assets-linux
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Install packaging tools (cargo-deb, cargo-generate-rpm)
+        if: matrix.os == 'ubuntu-latest'
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deb,cargo-generate-rpm
 
       - name: Install Linux dependencies and RPM tools
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwayland-dev libxkbcommon-dev libegl1-mesa-dev libgl1-mesa-dev libgles2-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev rpm
-          cargo install cargo-deb cargo-generate-rpm
 
       - name: Build Windows Release (Static CRT)
         if: matrix.os == 'windows-latest'
         env:
-          # Injection de l'antidote : on force le linker statique pour tuer la dépendance VCRUNTIME
           RUSTFLAGS: "-C target-feature=+crt-static"
         run: cargo build --release
 
-      - name: Build Linux Packages (.deb & .rpm)
+      - name: Build Linux Packages (.deb, .rpm & binary)
         if: matrix.os == 'ubuntu-latest'
         run: |
           cargo build --release
@@ -47,17 +53,18 @@ jobs:
 
       - name: Upload Windows Artifact
         if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         with:
-          name: assets-windows
-          path: target/release/rustcalc.exe
+          name: ${{ matrix.asset_name }}
+          path: target/release/${{ matrix.artifact_name }}
 
       - name: Upload Linux Artifacts
         if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         with:
-          name: assets-linux
+          name: ${{ matrix.asset_name }}
           path: |
+            target/release/${{ matrix.artifact_name }}
             target/debian/*.deb
             target/generate-rpm/*.rpm
 
@@ -70,16 +77,16 @@ jobs:
 
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v4
         with:
           path: artifacts
 
       - name: Create Release
-        # Mise à jour critique : passage à la v2
         uses: softprops/action-gh-release@v2
         with:
           files: |
             artifacts/**/*.exe
+            artifacts/**/rustcalc
             artifacts/**/*.deb
             artifacts/**/*.rpm
           fail_on_unmatched_files: true

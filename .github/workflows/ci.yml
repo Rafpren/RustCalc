@@ -3,8 +3,18 @@ name: Rust CI
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'docs/**'
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'docs/**'
 
 env:
   CARGO_TERM_COLOR: always
@@ -19,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout du code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Installation des dépendances Linux (egui/eframe)
         if: matrix.os == 'ubuntu-latest'
@@ -35,17 +45,19 @@ jobs:
       - name: Cache des dépendances
         uses: Swatinem/rust-cache@v2
 
-      # Le formatage et l'analyse statique ne tournent que sur Ubuntu pour gagner du temps
       - name: Vérification du format (rustfmt)
         if: matrix.os == 'ubuntu-latest'
         run: cargo fmt --check
 
       - name: Analyse statique (clippy)
-        if: matrix.os == 'ubuntu-latest'
         run: cargo clippy -- -D warnings
 
-      - name: Compilation (Debug)
-        run: cargo build --verbose
+      - name: Exécution des tests Windows (Static CRT)
+        if: matrix.os == 'windows-latest'
+        env:
+          RUSTFLAGS: "-C target-feature=+crt-static"
+        run: cargo test --verbose
 
-      - name: Exécution des tests unitaires
+      - name: Exécution des tests Linux
+        if: matrix.os == 'ubuntu-latest'
         run: cargo test --verbose
