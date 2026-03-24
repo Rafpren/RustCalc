@@ -70,6 +70,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -77,7 +79,8 @@ jobs:
           path: artifacts
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        # Mise à jour critique : passage à la v2
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             artifacts/**/*.exe
