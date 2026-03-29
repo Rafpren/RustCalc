@@ -1,6 +1,6 @@
 [package]
 name = "rustcalc"
-version = "1.2.11"
+version = "1.2.12"
 edition = "2024"
 license = "GPL-3.0-only"
 description = "Une calculatrice élégante développée en Rust avec egui."
@@ -9,7 +9,7 @@ repository = "https://github.com/Rafpren/RustCalc"
 authors = ["Rafpren"]
 
 [dependencies]
-eframe = "0.33.3"
+eframe = "0.34.1"
 image = { version = "0.25", default-features = false, features = ["png"] }
 
 [build-dependencies]

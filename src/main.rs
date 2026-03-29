@@ -23,14 +23,25 @@ fn main() -> eframe::Result<()> {
         })
     })();
 
+    // Construction conditionnelle du Viewport
+    let mut viewport = egui::ViewportBuilder::default()
+        .with_inner_size([340.0, 620.0])
+        .with_resizable(false);
+
+    // Sécurité stricte : On n'attache l'icône au gestionnaire de fenêtres
+    // que si le décodage binaire a réussi (évite un crash de dimension 0 sur Wayland/Windows)
+    if let Some(icon_data) = icon {
+        viewport = viewport.with_icon(Arc::new(icon_data));
+    }
+
     let native_options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default()
-            .with_inner_size([340.0, 620.0])
-            .with_icon(Arc::new(icon.unwrap_or_default()))
-            .with_resizable(false),
+        viewport,
         ..Default::default()
     };
 
+    // On n'écrit sur la sortie standard qu'en mode debug.
+    // En release Windows, le sous-système fenêtré détache la console, écrire dedans est inutile/risqué.
+    #[cfg(debug_assertions)]
     println!("Lancement de RustCalc...");
 
     eframe::run_native(
