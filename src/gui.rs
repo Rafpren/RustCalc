@@ -134,7 +134,6 @@ impl eframe::App for CalculatriceApp {
                     );
                     ui.add_space(5.0);
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
-
                         let (text_size, color) = if self.a_erreur {
                             (18.0, Color32::LIGHT_RED)
                         } else {
@@ -148,7 +147,7 @@ impl eframe::App for CalculatriceApp {
                                     .strong()
                                     .color(color),
                             )
-                                .truncate()
+                            .truncate(),
                         );
                     });
                 });
@@ -199,7 +198,7 @@ impl eframe::App for CalculatriceApp {
                                             .size(20.0)
                                             .color(color.unwrap_or(Color32::WHITE)),
                                     )
-                                        .min_size(btn_size),
+                                    .min_size(btn_size),
                                 )
                                 .clicked()
                             {
@@ -234,9 +233,7 @@ impl eframe::App for CalculatriceApp {
 
                     if ui
                         .add(
-                            Button::new(
-                                RichText::new("=").size(24.0).color(Color32::BLACK),
-                            )
+                            Button::new(RichText::new("=").size(24.0).color(Color32::BLACK))
                                 .min_size(btn_size)
                                 .fill(Color32::from_rgb(40, 190, 150)),
                         )
