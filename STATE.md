@@ -15,7 +15,7 @@
     * Génération et publication automatiques sur GitHub Releases : `rustcalc.exe` (Windows), `rustcalc-*.rpm` (Fedora), `rustcalc_*.deb` (Debian/Ubuntu).
 
 ## 3. État Actuel
-* **Dernière version en production :** v1.2.13.
+* **Dernière version en production :** v1.2.14.
 * **Workflow :** Règles de branche respectées sans contourner le Ruleset
 * **Statut du dépôt local :** Nettoyé de toute dette Git.
 
