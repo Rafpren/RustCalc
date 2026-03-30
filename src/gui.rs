@@ -6,6 +6,7 @@ pub struct CalculatriceApp {
     input: String,
     resultat: String,
     a_erreur: bool,
+    nouveau_calcul: bool,
 }
 
 impl Default for CalculatriceApp {
@@ -14,6 +15,7 @@ impl Default for CalculatriceApp {
             input: String::new(),
             resultat: String::from("0"),
             a_erreur: false,
+            nouveau_calcul: false,
         }
     }
 }
@@ -39,6 +41,7 @@ impl CalculatriceApp {
                         self.resultat = "0".into();
                     }
                     self.a_erreur = false;
+                    self.nouveau_calcul = true;
                 }
             }
             Err(msg) => {
@@ -48,10 +51,19 @@ impl CalculatriceApp {
         }
     }
 
+    fn ajouter_caractere(&mut self, c: char) {
+        if self.nouveau_calcul && (c.is_ascii_digit() || c == '(' || c == '.') {
+            self.input.clear();
+        }
+        self.nouveau_calcul = false;
+        self.input.push(c);
+    }
+
     fn effacer(&mut self) {
         self.input.clear();
         self.resultat = "0".into();
         self.a_erreur = false;
+        self.nouveau_calcul = false;
     }
 }
 
@@ -71,9 +83,9 @@ impl eframe::App for CalculatriceApp {
                     egui::Event::Text(t) => {
                         for c in t.chars() {
                             match c {
-                                '0'..='9' | '+' | '-' | '(' | ')' | '.' => self.input.push(c),
-                                '*' | '×' => self.input.push('×'),
-                                '/' | '÷' => self.input.push('÷'),
+                                '0'..='9' | '+' | '-' | '(' | ')' | '.' => self.ajouter_caractere(c),
+                                '*' | '×' => self.ajouter_caractere('×'),
+                                '/' | '÷' => self.ajouter_caractere('÷'),
                                 _ => {}
                             }
                         }
@@ -94,7 +106,6 @@ impl eframe::App for CalculatriceApp {
         });
 
         // --- FOOTER ---
-        // Utilisation de egui::Panel au lieu du type déprécié TopBottomPanel
         egui::Panel::bottom("footer")
             .frame(egui::Frame::default().inner_margin(10))
             .show_inside(ui, |footer_ui| {
@@ -108,7 +119,6 @@ impl eframe::App for CalculatriceApp {
                 });
             });
 
-        // --- INTERFACE PRINCIPALE ---
         egui::CentralPanel::default()
             .frame(egui::Frame::default().inner_margin(15))
             .show_inside(ui, |main_ui| {
@@ -128,7 +138,6 @@ impl eframe::App for CalculatriceApp {
                         egui::TextEdit::singleline(&mut self.input)
                             .font(egui::FontId::monospace(18.0))
                             .desired_width(f32::INFINITY)
-                            // Typage strict exigé par la v0.34.1
                             .frame(egui::Frame::NONE)
                             .interactive(false),
                     );
@@ -147,7 +156,7 @@ impl eframe::App for CalculatriceApp {
                                     .strong()
                                     .color(color),
                             )
-                            .truncate(),
+                                .truncate(),
                         );
                     });
                 });
@@ -198,14 +207,16 @@ impl eframe::App for CalculatriceApp {
                                             .size(20.0)
                                             .color(color.unwrap_or(Color32::WHITE)),
                                     )
-                                    .min_size(btn_size),
+                                        .min_size(btn_size),
                                 )
                                 .clicked()
                             {
                                 if label == "C" {
                                     self.effacer();
                                 } else {
-                                    self.input.push_str(label);
+                                    for c in label.chars() {
+                                        self.ajouter_caractere(c);
+                                    }
                                 }
                             }
                         }
@@ -222,13 +233,13 @@ impl eframe::App for CalculatriceApp {
                         )
                         .clicked()
                     {
-                        self.input.push('0');
+                        self.ajouter_caractere('0');
                     }
                     if ui
                         .add(Button::new(RichText::new(".").size(20.0)).min_size(btn_size))
                         .clicked()
                     {
-                        self.input.push('.');
+                        self.ajouter_caractere('.');
                     }
 
                     if ui
