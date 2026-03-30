@@ -16,8 +16,9 @@
 
 ## 3. État Actuel
 * **Dernière version en production :** v1.2.14.
-* **Workflow :** Règles de branche respectées sans contourner le Ruleset
-* **Statut du dépôt local :** Nettoyé de toute dette Git.
+* **Dernière modification majeure :** Refonte de la logique de saisie (`nouveau_calcul`) et nettoyage de l'interface graphique (API eframe v0.34.1).
+* **Workflow :** Règles de branche respectées sans contourner le Ruleset.
+* **Statut du dépôt local :** Synchronisé et nettoyé de toute dette Git.
 
 ## 4. Objectif de la session actuelle
 * ...
