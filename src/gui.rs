@@ -83,7 +83,9 @@ impl eframe::App for CalculatriceApp {
                     egui::Event::Text(t) => {
                         for c in t.chars() {
                             match c {
-                                '0'..='9' | '+' | '-' | '(' | ')' | '.' => self.ajouter_caractere(c),
+                                '0'..='9' | '+' | '-' | '(' | ')' | '.' => {
+                                    self.ajouter_caractere(c)
+                                }
                                 '*' | '×' => self.ajouter_caractere('×'),
                                 '/' | '÷' => self.ajouter_caractere('÷'),
                                 _ => {}
@@ -156,7 +158,7 @@ impl eframe::App for CalculatriceApp {
                                     .strong()
                                     .color(color),
                             )
-                                .truncate(),
+                            .truncate(),
                         );
                     });
                 });
@@ -207,7 +209,7 @@ impl eframe::App for CalculatriceApp {
                                             .size(20.0)
                                             .color(color.unwrap_or(Color32::WHITE)),
                                     )
-                                        .min_size(btn_size),
+                                    .min_size(btn_size),
                                 )
                                 .clicked()
                             {
