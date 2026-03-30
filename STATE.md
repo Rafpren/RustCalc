@@ -1,4 +1,4 @@
-# CONTEXTE PROJET : RUSTCALC
+# CONTEXTE PROJET : RUSTCALC 30-03-2026
 
 ## 1. Stack Technique
 * **Langage :** Rust (Édition 2024).
@@ -20,4 +20,4 @@
 * **Statut du dépôt local :** Nettoyé de toute dette Git.
 
 ## 4. Objectif de la session actuelle
-* Ajouter la gestion des fonctions trigonométriques, Changer le thème de couleurs, psser à la version 1.2.13 une fois fait]
+* ...
