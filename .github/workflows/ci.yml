@@ -3,6 +3,7 @@ name: Rust CI
 on:
   push:
     branches: [ "main" ]
+    tags: [ "v*" ]
     paths-ignore:
       - 'README.md'
       - 'LICENSE'
@@ -44,6 +45,8 @@ jobs:
 
       - name: Cache des dépendances
         uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "v2-cache-bust" # Invalidation volontaire pour détruire un éventuel cache LTO corrompu
 
       - name: Vérification du format (rustfmt)
         if: matrix.os == 'ubuntu-latest'
@@ -55,8 +58,10 @@ jobs:
       - name: Exécution des tests Windows (Static CRT)
         if: matrix.os == 'windows-latest'
         env:
-          RUSTFLAGS: "-C target-feature=+crt-static"
-        run: cargo test --verbose
+          # Ciblage strict : le flag s'applique uniquement à la cible MSVC, pas aux macros procédurales hôtes
+          CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUSTFLAGS: "-C target-feature=+crt-static"
+        # L'argument --target oblige Cargo à dissocier proprement le contexte hôte (macros) et cible
+        run: cargo test --target x86_64-pc-windows-msvc --verbose
 
       - name: Exécution des tests Linux
         if: matrix.os == 'ubuntu-latest'
