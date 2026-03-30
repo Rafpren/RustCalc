@@ -2593,7 +2593,7 @@ dependencies = [
 
 [[package]]
 name = "rustcalc"
-version = "1.2.12"
+version = "1.2.14"
 dependencies = [
  "eframe",
  "image",
