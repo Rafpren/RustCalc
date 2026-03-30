@@ -2,6 +2,9 @@ use crate::engine::resoudre_expression;
 use eframe::egui;
 use eframe::egui::{Button, Color32, Key, RichText, Vec2};
 
+// On récupère la version définie dans le Cargo.toml à la compilation
+const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
+
 pub struct CalculatriceApp {
     input: String,
     resultat: String,
@@ -55,6 +58,10 @@ impl CalculatriceApp {
         if self.nouveau_calcul && (c.is_ascii_digit() || c == '(' || c == '.') {
             self.input.clear();
         }
+        if self.nouveau_calcul && "+-×÷*/".contains(c) {
+            self.input = self.resultat.clone();
+        }
+
         self.nouveau_calcul = false;
         self.input.push(c);
     }
@@ -69,14 +76,13 @@ impl CalculatriceApp {
 
 impl eframe::App for CalculatriceApp {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
-        let mut visuals = egui::Visuals::dark();
-        visuals.widgets.inactive.bg_fill = Color32::from_rgb(45, 45, 50);
-        visuals.widgets.inactive.corner_radius = egui::CornerRadius::same(4);
+        if !ui.ctx().global_style().visuals.dark_mode {
+            let mut visuals = egui::Visuals::dark();
+            visuals.widgets.inactive.bg_fill = Color32::from_rgb(45, 45, 50);
+            visuals.widgets.inactive.corner_radius = egui::CornerRadius::same(4);
+            ui.ctx().set_visuals(visuals);
+        }
 
-        // Récupération du contexte depuis l'objet ui fourni par la nouvelle API
-        ui.ctx().set_visuals(visuals);
-
-        // --- GESTION DES TOUCHES HYBRIDE ---
         ui.input(|i| {
             for event in &i.events {
                 match event {
@@ -107,17 +113,30 @@ impl eframe::App for CalculatriceApp {
             }
         });
 
-        // --- FOOTER ---
+        // --- FOOTER OPTIMISÉ AVEC VERSION ---
         egui::Panel::bottom("footer")
             .frame(egui::Frame::default().inner_margin(10))
             .show_inside(ui, |footer_ui| {
-                footer_ui.vertical_centered(|ui| {
+                footer_ui.horizontal(|ui| {
                     ui.label(
-                        RichText::new("Développé par : Raffaele PRENCIPE")
-                            .size(11.0)
-                            .strong()
-                            .color(Color32::from_rgb(110, 160, 255)),
+                        RichText::new(format!("v{}", APP_VERSION))
+                            .size(10.0)
+                            .color(Color32::from_gray(100)),
                     );
+
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        ui.label(
+                            RichText::new("Raffaele PRENCIPE")
+                                .size(11.0)
+                                .strong()
+                                .color(Color32::from_rgb(110, 160, 255)),
+                        );
+                        ui.label(
+                            RichText::new("Développé par :")
+                                .size(11.0)
+                                .color(Color32::GRAY),
+                        );
+                    });
                 });
             });
 
@@ -141,8 +160,10 @@ impl eframe::App for CalculatriceApp {
                             .font(egui::FontId::monospace(18.0))
                             .desired_width(f32::INFINITY)
                             .frame(egui::Frame::NONE)
-                            .interactive(false),
+                            .interactive(true)
+                            .hint_text("Saisissez votre calcul..."),
                     );
+
                     ui.add_space(5.0);
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
                         let (text_size, color) = if self.a_erreur {
@@ -151,14 +172,11 @@ impl eframe::App for CalculatriceApp {
                             (36.0, Color32::WHITE)
                         };
 
-                        ui.add(
-                            egui::Label::new(
-                                RichText::new(&self.resultat)
-                                    .size(text_size)
-                                    .strong()
-                                    .color(color),
-                            )
-                            .truncate(),
+                        ui.label(
+                            RichText::new(&self.resultat)
+                                .size(text_size)
+                                .strong()
+                                .color(color),
                         );
                     });
                 });
@@ -216,9 +234,7 @@ impl eframe::App for CalculatriceApp {
                                 if label == "C" {
                                     self.effacer();
                                 } else {
-                                    for c in label.chars() {
-                                        self.ajouter_caractere(c);
-                                    }
+                                    self.ajouter_caractere(label.chars().next().unwrap());
                                 }
                             }
                         }
@@ -243,7 +259,6 @@ impl eframe::App for CalculatriceApp {
                     {
                         self.ajouter_caractere('.');
                     }
-
                     if ui
                         .add(
                             Button::new(RichText::new("=").size(24.0).color(Color32::BLACK))
