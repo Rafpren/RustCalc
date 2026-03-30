@@ -26,6 +26,10 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      # Ajout critique : Mise en cache pour diviser le temps de build par 3
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+
       - name: Install packaging tools (cargo-deb, cargo-generate-rpm)
         if: matrix.os == 'ubuntu-latest'
         uses: taiki-e/install-action@v2
@@ -38,17 +42,21 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwayland-dev libxkbcommon-dev libegl1-mesa-dev libgl1-mesa-dev libgles2-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev rpm
 
-      - name: Build Windows Release (Static CRT)
+      # Build Windows avec compression extrême et CRT statique
+      - name: Build Windows Release (Static CRT & Strip)
         if: matrix.os == 'windows-latest'
         env:
-          RUSTFLAGS: "-C target-feature=+crt-static"
+          RUSTFLAGS: "-C target-feature=+crt-static -C strip=symbols -C lto=fat -C opt-level=z"
         run: cargo build --release
 
+      # Build Linux avec compression extrême
       - name: Build Linux Packages (.deb, .rpm & binary)
         if: matrix.os == 'ubuntu-latest'
+        env:
+          RUSTFLAGS: "-C strip=symbols -C lto=fat -C opt-level=z"
         run: |
           cargo build --release
-          cargo deb
+          cargo deb --no-build
           cargo generate-rpm
 
       - name: Upload Windows Artifact
