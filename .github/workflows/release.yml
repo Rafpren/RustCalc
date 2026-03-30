@@ -26,9 +26,10 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      # Ajout critique : Mise en cache pour diviser le temps de build par 3
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "v2-release-cache"
 
       - name: Install packaging tools (cargo-deb, cargo-generate-rpm)
         if: matrix.os == 'ubuntu-latest'
@@ -42,18 +43,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwayland-dev libxkbcommon-dev libegl1-mesa-dev libgl1-mesa-dev libgles2-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev rpm
 
-      # Build Windows avec compression extrême et CRT statique
-      - name: Build Windows Release (Static CRT & Strip)
+      # Build Windows : On cible EXCLUSIVEMENT l'environnement MSVC pour le CRT statique
+      # Les optimisations (LTO, opt-level, strip) sont déléguées au Cargo.toml
+      - name: Build Windows Release (Static CRT)
         if: matrix.os == 'windows-latest'
         env:
-          RUSTFLAGS: "-C target-feature=+crt-static -C strip=symbols -C lto=fat -C opt-level=z"
-        run: cargo build --release
+          CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUSTFLAGS: "-C target-feature=+crt-static"
+        run: cargo build --release --target x86_64-pc-windows-msvc
 
-      # Build Linux avec compression extrême
+      # Build Linux : Aucune pollution environnementale tolérée
       - name: Build Linux Packages (.deb, .rpm & binary)
         if: matrix.os == 'ubuntu-latest'
-        env:
-          RUSTFLAGS: "-C strip=symbols -C lto=fat -C opt-level=z"
         run: |
           cargo build --release
           cargo deb --no-build
@@ -64,7 +64,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset_name }}
-          path: target/release/${{ matrix.artifact_name }}
+          # Le chemin change car on compile avec un --target explicite
+          path: target/x86_64-pc-windows-msvc/release/${{ matrix.artifact_name }}
 
       - name: Upload Linux Artifacts
         if: matrix.os == 'ubuntu-latest'
