@@ -1,6 +1,6 @@
 [package]
 name = "rustcalc"
-version = "1.2.12"
+version = "1.2.13"
 edition = "2024"
 license = "GPL-3.0-only"
 description = "Une calculatrice élégante développée en Rust avec egui."
